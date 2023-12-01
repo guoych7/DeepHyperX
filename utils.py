@@ -13,6 +13,7 @@ import os
 import re
 import torch
 
+
 def get_device(ordinal):
     # Use GPU ?
     if ordinal < 0:
@@ -41,6 +42,7 @@ def open_file(dataset):
         return img.load()
     else:
         raise ValueError("Unknown file format: {}".format(ext))
+
 
 def convert_to_color_(arr_2d, palette=None):
     """Convert an array of labels to RGB color-encoded image.
@@ -90,12 +92,13 @@ def convert_from_color_(arr_3d, palette=None):
 def display_predictions(pred, vis, gt=None, caption=""):
     if gt is None:
         vis.images([np.transpose(pred, (2, 0, 1))],
-                    opts={'caption': caption})
+                   opts={'caption': caption})
     else:
         vis.images([np.transpose(pred, (2, 0, 1)),
                     np.transpose(gt, (2, 0, 1))],
-                    nrow=2,
-                    opts={'caption': caption})
+                   nrow=2,
+                   opts={'caption': caption})
+
 
 def display_dataset(img, gt, bands, labels, palette, vis):
     """Display the specified dataset.
@@ -118,7 +121,8 @@ def display_dataset(img, gt, bands, labels, palette, vis):
     caption = "RGB (bands {}, {}, {})".format(*bands)
     # send to visdom server
     vis.images([np.transpose(rgb, (2, 0, 1))],
-                opts={'caption': caption})
+               opts={'caption': caption})
+
 
 def explore_spectrums(img, complete_gt, class_names, vis,
                       ignored_labels=None):
@@ -378,7 +382,7 @@ def metrics(prediction, target, ignored_labels=[], n_classes=None):
     # Compute kappa coefficient
     pa = np.trace(cm) / float(total)
     pe = np.sum(np.sum(cm, axis=0) * np.sum(cm, axis=1)) / \
-        float(total * total)
+         float(total * total)
     kappa = (pa - pe) / (1 - pe)
     results["Kappa"] = kappa
 
@@ -451,35 +455,35 @@ def sample_gt(gt, train_size, mode='random'):
 
     """
     indices = np.nonzero(gt)
-    X = list(zip(*indices)) # x,y features
-    y = gt[indices].ravel() # classes
+    X = list(zip(*indices))  # x,y features
+    y = gt[indices].ravel()  # classes
     train_gt = np.zeros_like(gt)
     test_gt = np.zeros_like(gt)
     if train_size > 1:
-       train_size = int(train_size)
+        train_size = int(train_size)
 
     if mode == 'random':
-       train_indices, test_indices = sklearn.model_selection.train_test_split(X, train_size=train_size, stratify=y)
-       train_indices = [list(t) for t in zip(*train_indices)]
-       test_indices = [list(t) for t in zip(*test_indices)]
-       train_gt[train_indices] = gt[train_indices]
-       test_gt[test_indices] = gt[test_indices]
+        train_indices, test_indices = sklearn.model_selection.train_test_split(X, train_size=train_size, stratify=y)
+        train_indices = [list(t) for t in zip(*train_indices)]
+        test_indices = [list(t) for t in zip(*test_indices)]
+        train_gt[train_indices] = gt[train_indices]
+        test_gt[test_indices] = gt[test_indices]
     elif mode == 'fixed':
-       print("Sampling {} with train size = {}".format(mode, train_size))
-       train_indices, test_indices = [], []
-       for c in np.unique(gt):
-           if c == 0:
-              continue
-           indices = np.nonzero(gt == c)
-           X = list(zip(*indices)) # x,y features
+        print("Sampling {} with train size = {}".format(mode, train_size))
+        train_indices, test_indices = [], []
+        for c in np.unique(gt):
+            if c == 0:
+                continue
+            indices = np.nonzero(gt == c)
+            X = list(zip(*indices))  # x,y features
 
-           train, test = sklearn.model_selection.train_test_split(X, train_size=train_size)
-           train_indices += train
-           test_indices += test
-       train_indices = [list(t) for t in zip(*train_indices)]
-       test_indices = [list(t) for t in zip(*test_indices)]
-       train_gt[train_indices] = gt[train_indices]
-       test_gt[test_indices] = gt[test_indices]
+            train, test = sklearn.model_selection.train_test_split(X, train_size=train_size)
+            train_indices += train
+            test_indices += test
+        train_indices = [list(t) for t in zip(*train_indices)]
+        test_indices = [list(t) for t in zip(*test_indices)]
+        train_gt[train_indices] = gt[train_indices]
+        test_gt[test_indices] = gt[test_indices]
 
     elif mode == 'disjoint':
         train_gt = np.copy(gt)
@@ -537,6 +541,7 @@ def compute_imf_weights(ground_truth, n_classes=None, ignored_classes=[]):
     weights[idx] = median / frequencies[idx]
     weights[frequencies == 0] = 0.
     return weights
+
 
 def camel_to_snake(name):
     s = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
