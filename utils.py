@@ -465,7 +465,9 @@ def sample_gt(gt, train_size, mode='random'):
     if mode == 'random':
         train_indices, test_indices = sklearn.model_selection.train_test_split(X, train_size=train_size, stratify=y)
         train_indices = [list(t) for t in zip(*train_indices)]
+        train_indices = (train_indices[0], train_indices[1])
         test_indices = [list(t) for t in zip(*test_indices)]
+        test_indices = (test_indices[0], test_indices[1])
         train_gt[train_indices] = gt[train_indices]
         test_gt[test_indices] = gt[test_indices]
     elif mode == 'fixed':
